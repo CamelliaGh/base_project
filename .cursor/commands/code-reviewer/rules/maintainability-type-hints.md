@@ -2,7 +2,7 @@
 title: Add Type Hints
 impact: MEDIUM
 category: maintainability
-tags: types, python, typescript, type-safety
+tags: types, python, typescript, php, type-safety
 ---
 
 # Add Type Hints
@@ -87,7 +87,30 @@ function processOrder(
 }
 ```
 
+## PHP (7.4+ type hints and PHPDoc)
+
+```php
+// ✅ Property and return type hints (PHP 7.4+)
+class UserService
+{
+    public function getUser(int $id): ?User
+    {
+        return $this->users->get($id);
+    }
+
+    /** @param array{total: float} $order */
+    public function processOrder(array $order, ?float $discount = null): float
+    {
+        if ($discount !== null) {
+            return $order['total'] * (1 - $discount);
+        }
+        return $order['total'];
+    }
+}
+```
+
 ## References
 
 - [Python Type Hints](https://docs.python.org/3/library/typing.html)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
+- [PHP Type Declarations](https://www.php.net/manual/en/language.types.declarations.php)

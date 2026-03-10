@@ -1,5 +1,5 @@
 ---
-description: Write and run tests for frontend and backend tasks
+description: Write and run tests for frontend, backend, and PHP tasks
 alwaysApply: true
 ---
 
@@ -14,6 +14,7 @@ Write tests for:
 - **Edge cases**: Test error handling, empty inputs, boundary conditions
 - **API endpoints**: Test request/response handling, status codes, error cases
 - **React components**: Test rendering, user interactions, state changes, error states
+- **PHP classes and APIs**: Unit tests for logic, feature/integration tests for HTTP endpoints (e.g. Laravel, Symfony)
 
 ## Frontend Testing (Vitest + React Testing Library)
 
@@ -136,12 +137,95 @@ def test_error_handling():
 - Use `tmp_path` fixture for temporary files
 - Test edge cases: empty inputs, None values, boundary conditions
 
+## PHP Testing (PHPUnit)
+
+### Running Tests
+
+```bash
+# Run all tests
+./vendor/bin/phpunit
+
+# Or via Composer script
+composer test
+
+# Run specific test file
+./vendor/bin/phpunit tests/Unit/UserServiceTest.php
+
+# Run specific test method
+./vendor/bin/phpunit --filter testGetUserById tests/Unit/UserServiceTest.php
+
+# Run with coverage
+./vendor/bin/phpunit --coverage-text
+# or
+./vendor/bin/phpunit --coverage-html coverage
+```
+
+### Writing PHP Tests
+
+**File naming**: `*Test.php` in `tests/` (e.g. `tests/Unit/UserServiceTest.php`, `tests/Feature/UserApiTest.php`)
+
+**Test structure**:
+```php
+<?php
+
+namespace Tests\Unit;
+
+use PHPUnit\Framework\TestCase;
+use App\Service\UserService;
+
+class UserServiceTest extends TestCase
+{
+    public function test_get_user_by_id_returns_user(): void
+    {
+        $service = new UserService();
+        $user = $service->getUserById(1);
+        $this->assertNotNull($user);
+        $this->assertSame(1, $user->id);
+    }
+
+    public function test_get_user_by_id_returns_null_for_missing(): void
+    {
+        $service = new UserService();
+        $this->assertNull($service->getUserById(999));
+    }
+}
+```
+
+**Laravel HTTP/feature test example**:
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class UserApiTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_list_users(): void
+    {
+        $response = $this->getJson('/api/users');
+        $response->assertStatus(200)->assertJsonStructure(['data']);
+    }
+}
+```
+
+**Best practices**:
+- Use descriptive method names: `test_what_is_being_tested` or `test_expected_behavior_when_condition`
+- Put unit tests in `tests/Unit/`, feature/HTTP tests in `tests/Feature/`
+- Use `setUp()` / `setUpBeforeClass()` for shared fixtures
+- Mock external deps with `$this->createMock()` or Laravel's `Mockery`
+- Test both success and error paths; use `$this->expectException()` for exceptions
+- Prefer PHPUnit's assertion methods (`assertSame`, `assertArrayHasKey`, etc.)
+
 ## Test Execution Workflow
 
 1. **Before implementing**: Consider what tests are needed
 2. **During implementation**: Write tests alongside code (TDD if preferred)
 3. **After implementation**: 
-   - Run the test suite: `cd frontend && npm test` or `cd backend && pytest`
+   - Run the test suite: `cd frontend && npm test`, `cd backend && pytest`, or `./vendor/bin/phpunit` (PHP)
    - Fix any failing tests
    - Ensure all tests pass before marking task complete
 4. **Before committing**: Verify all tests pass
@@ -180,9 +264,17 @@ def test_endpoint_success(client):
     assert response.json()["result"] == "expected"
 ```
 
+### PHP: Mocking dependencies (PHPUnit)
+```php
+$mockRepo = $this->createMock(UserRepository::class);
+$mockRepo->method('find')->with(1)->willReturn(new User(1, 'Jane'));
+$service = new UserService($mockRepo);
+$this->assertSame('Jane', $service->getUserName(1));
+```
+
 ## Troubleshooting
 
-- **Tests not found**: Check file naming (`*.test.tsx`, `test_*.py`)
+- **Tests not found**: Check file naming (`*.test.tsx`, `test_*.py`, `*Test.php`)
 - **Import errors**: Ensure test files are in correct directories
 - **Mock not working**: Verify `vi.mock()` is called before imports
 - **Async issues**: Use `waitFor` in frontend, `await` in backend async tests

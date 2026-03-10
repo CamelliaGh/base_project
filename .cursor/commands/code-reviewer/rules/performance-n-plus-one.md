@@ -65,6 +65,15 @@ const resolvers = {
 };
 ```
 
+### PHP (Laravel Eloquent)
+```php
+// ❌ N+1 queries
+$posts = Post::all();  // 1 query
+foreach ($posts as $post) {
+    echo $post->author->name;  // N queries (lazy load)
+}
+```
+
 ## ✅ Correct
 
 ### Solution 1: Eager Loading / Join Fetching
@@ -113,6 +122,26 @@ const posts = await prisma.post.findMany({
     author: true
   }
 });
+```
+
+**PHP (Laravel Eloquent)**
+```php
+// ✅ Eager load relation (1 query with JOIN or 2 queries)
+$posts = Post::with('author')->get();
+foreach ($posts as $post) {
+    echo $post->title . ' by ' . $post->author->name;  // No extra query!
+}
+```
+
+**PHP (Doctrine ORM)**
+```php
+// ✅ Eager fetch
+$posts = $em->getRepository(Post::class)
+    ->createQueryBuilder('p')
+    ->leftJoin('p.author', 'a')
+    ->addSelect('a')
+    ->getQuery()
+    ->getResult();
 ```
 
 ### Solution 2: Batching / DataLoader (for GraphQL)
@@ -214,6 +243,7 @@ const sequelize = new Sequelize({
 ### Profiling Tools
 - **Django**: django-silk, django-debug-toolbar
 - **Rails**: bullet gem
+- **PHP/Laravel**: Laravel Debugbar, Telescope, or enable query log
 - **Node.js**: Sequelize logging, Prisma debug mode
 - **GraphQL**: graphql-query-complexity
 

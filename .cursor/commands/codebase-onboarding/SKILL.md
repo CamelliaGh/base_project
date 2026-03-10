@@ -9,9 +9,9 @@ When the user asks to get familiar with a new codebase (or similar: onboard me, 
 
 ## Workflow
 
-1. **Discover structure**: List root; find config files (package.json, requirements.txt, pyproject.toml, Cargo.toml, go.mod, Dockerfile, docker-compose*, Makefile, README, .env.example).
+1. **Discover structure**: List root; find config files (package.json, requirements.txt, pyproject.toml, composer.json, Cargo.toml, go.mod, Dockerfile, docker-compose*, Makefile, README, .env.example). For PHP: composer.json, composer.lock, phpunit.xml, phpunit.xml.dist, .phpunit.result.cache.
 2. **Tech stack**: Infer from lockfiles, configs, and entry points (e.g. main, index, app).
-3. **How to run**: Extract from README, package scripts, Makefile, docker-compose, and any run/deploy docs.
+3. **How to run**: Extract from README, package scripts, Makefile, docker-compose, and any run/deploy docs. For PHP: check composer.json "scripts", php -S / artisan serve / symfony serve, and phpunit for tests.
 4. **Main flows**: Identify entry points, key routes/APIs, and critical user or data flows (auth, core features).
 5. **Vulnerabilities & hygiene**: Check for hardcoded secrets, outdated/vulnerable deps, unsafe patterns (eval, shell injection, SQL concatenation), missing env validation, and exposed config.
 
@@ -55,6 +55,7 @@ Output the report in markdown using this structure:
 ## Tips
 
 - Prefer reading README, CONTRIBUTING, and package/root configs first.
+- For PHP projects: in "How to run" include `composer install`, run commands (`php -S`, `php artisan serve`, or `symfony serve` as appropriate), and tests (`./vendor/bin/phpunit` or `composer test`).
 - For “main flows”, trace from entry point to a few key features; no need to list every file.
-- For vulnerabilities, use dependency audit commands if available (e.g. `npm audit`, `pip-audit`, `cargo audit`) and note when not run; still flag obvious code/config risks.
+- For vulnerabilities, use dependency audit commands if available (e.g. `npm audit`, `pip-audit`, `composer audit`, `cargo audit`) and note when not run; still flag obvious code/config risks.
 - Keep the report scannable: bullets and short paragraphs; link to key files when helpful.

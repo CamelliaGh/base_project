@@ -110,6 +110,26 @@ const [rows] = await connection.execute(
 );
 ```
 
+### PHP (PDO)
+```php
+// ✅ Using prepared statement
+$stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+```
+
+### PHP (Laravel Eloquent / Query Builder)
+```php
+// ✅ Using ORM
+$user = User::find($user_id);
+
+// ✅ Using query builder with binding
+$user = DB::table('users')->where('id', $user_id)->first();
+
+// ✅ Raw with bindings
+$user = DB::selectOne('SELECT * FROM users WHERE id = ?', [$user_id]);
+```
+
 ## Additional Best Practices
 
 1. **Validate input types**

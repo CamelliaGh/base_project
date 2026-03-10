@@ -1,7 +1,7 @@
 ---
 description: "Core project context and patterns for efficient workflow"
 globs: 
-  - "**/*.{js,ts,tsx,py,css}"
+  - "**/*.{js,ts,tsx,py,php,css}"
 alwaysApply: true
 ---
 
@@ -21,17 +21,19 @@ Before considering work complete:
 - Verify the project builds successfully
 - **Frontend:** `cd frontend && npm run lint && npm run build`
 - **Backend:** Run `cd backend && ruff check . --fix`; fix any remaining linter/syntax errors; ensure the app runs (e.g. `uvicorn main:app`)
+- **PHP:** Run `composer run lint` or `./vendor/bin/phpcs` (if PHP_CodeSniffer is configured); fix syntax with `php -l`; ensure the app runs (e.g. `php -S localhost:8000`, `php artisan serve`, or `symfony serve`)
 
 ## 3. Run Tests
 
 - Run tests and fix any failures before marking work done
 - **Frontend:** `cd frontend && npm test` (when configured)
 - **Backend:** `cd backend && pytest` (when configured)
+- **PHP:** `./vendor/bin/phpunit` or `composer test` (when configured)
 - Add tests for new behavior; do not remove or skip tests to make builds pass
 
 ## 4. Mark Tasks Done
 
-After completing a task in `frontend/TASKS.md` or `backend/TASKS.md`:
+After completing a task in `frontend/TASKS.md`, `backend/TASKS.md`, or `php/TASKS.md`:
 
 - Change `- [ ]` to `- [x]` for the completed task
 - Do this in the same commit/change that implements it
@@ -52,11 +54,11 @@ After completing a task in `frontend/TASKS.md` or `backend/TASKS.md`:
 ## 7. Code Quality and Standards
 
 - **Don't overengineer; keep the code simple.** Prefer clear, minimal solutions over clever or speculative complexity.
-- **Use standard naming and conventions for the language** (e.g. PEP 8 for Python, common JS/TS conventions for frontend).
+- **Use standard naming and conventions for the language** (e.g. PEP 8 for Python, PSR-12 for PHP, common JS/TS conventions for frontend).
 - **Only modify code directly relevant to the specific request.** Avoid changing unrelated functionality.
 - **Never replace code with placeholders** like `// ... rest of the processing ...`. Always include complete, functional code.
 - **Use descriptive variable and function names** that align with existing project conventions.
-- Remove debug code (console.log, print statements, commented-out blocks)
+- Remove debug code (console.log, print, var_dump/error_log, commented-out blocks)
 - No temporary workarounds left without a TODO or ticket
 - Keep commits focused; avoid mixing unrelated changes
 

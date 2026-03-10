@@ -59,6 +59,8 @@ def get_user(user_id: int) -> Optional[Dict[str, Any]]:
     return result.fetchone() if result else None
 ```
 
+**PHP (PDO):** Use prepared statements: `$stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?'); $stmt->execute([$user_id]);` — see [security-sql-injection.md](rules/security-sql-injection.md) for Laravel/Doctrine.
+
 [➡️ Full details: security-sql-injection.md](rules/security-sql-injection.md)
 
 ---
