@@ -51,6 +51,8 @@ After completing a task in `frontend/TASKS.md` or `backend/TASKS.md`:
 
 ## 7. Code Quality and Standards
 
+- **Don't overengineer; keep the code simple.** Prefer clear, minimal solutions over clever or speculative complexity.
+- **Use standard naming and conventions for the language** (e.g. PEP 8 for Python, common JS/TS conventions for frontend).
 - **Only modify code directly relevant to the specific request.** Avoid changing unrelated functionality.
 - **Never replace code with placeholders** like `// ... rest of the processing ...`. Always include complete, functional code.
 - **Use descriptive variable and function names** that align with existing project conventions.

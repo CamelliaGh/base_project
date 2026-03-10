@@ -1,0 +1,188 @@
+---
+description: Write and run tests for frontend and backend tasks
+alwaysApply: true
+---
+
+# Write and Run Tests
+
+## When to Write Tests
+
+Write tests for:
+- **New features**: Every new feature must have tests
+- **Bug fixes**: Add tests that reproduce and verify the fix
+- **Refactoring**: Ensure existing tests still pass after refactoring
+- **Edge cases**: Test error handling, empty inputs, boundary conditions
+- **API endpoints**: Test request/response handling, status codes, error cases
+- **React components**: Test rendering, user interactions, state changes, error states
+
+## Frontend Testing (Vitest + React Testing Library)
+
+### Running Tests
+
+```bash
+# Run all tests once
+cd frontend && npm test
+
+# Run tests in watch mode
+cd frontend && npm run test:watch
+
+# Run tests for a specific file
+cd frontend && npm test ChatArea.test.tsx
+```
+
+### Writing Frontend Tests
+
+**File naming**: `ComponentName.test.tsx` or `moduleName.test.ts` (next to the source file)
+
+**Test structure**:
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ComponentName } from './ComponentName';
+
+describe('ComponentName', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should render correctly', () => {
+    render(<ComponentName />);
+    expect(screen.getByText('Expected text')).toBeInTheDocument();
+  });
+
+  it('should handle user interactions', async () => {
+    const user = userEvent.setup();
+    render(<ComponentName />);
+    
+    await user.click(screen.getByRole('button', { name: 'Click me' }));
+    
+    await waitFor(() => {
+      expect(screen.getByText('Result')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+**Best practices**:
+- Use `screen.getByRole`, `screen.getByLabelText`, `screen.getByPlaceholderText` for queries
+- Use `userEvent` for user interactions (not `fireEvent`)
+- Mock external dependencies (API calls, modules) with `vi.mock()`
+- Test user-visible behavior, not implementation details
+- Use `waitFor` for async operations
+- Test error states and edge cases (empty inputs, network failures)
+
+## Backend Testing (pytest)
+
+### Running Tests
+
+```bash
+# Run all tests
+cd backend && pytest
+
+# Run specific test file
+cd backend && pytest tests/test_trial.py
+
+# Run specific test function
+cd backend && pytest tests/test_trial.py::test_function_name
+
+# Run with verbose output
+cd backend && pytest -v
+
+# Run with coverage
+cd backend && pytest --cov=. --cov-report=html
+```
+
+### Writing Backend Tests
+
+**File naming**: `test_*.py` in `backend/tests/` directory
+
+**Test structure**:
+```python
+import pytest
+from unittest.mock import patch, Mock
+from your_module import function_to_test
+
+@pytest.fixture
+def client():
+    """FastAPI test client fixture."""
+    from fastapi.testclient import TestClient
+    from main import app
+    return TestClient(app)
+
+def test_function_behavior():
+    """Test description explaining what is being tested."""
+    result = function_to_test(input_data)
+    assert result == expected_output
+
+def test_api_endpoint(client):
+    """Test API endpoint."""
+    response = client.get("/api/endpoint")
+    assert response.status_code == 200
+    assert response.json() == expected_data
+
+def test_error_handling():
+    """Test error cases."""
+    with pytest.raises(ValueError):
+        function_to_test(invalid_input)
+```
+
+**Best practices**:
+- Use descriptive test function names: `test_what_is_being_tested`
+- Use fixtures for common setup (test clients, mock data)
+- Test both success and error paths
+- Use `pytest.raises` for exception testing
+- Mock external dependencies (databases, APIs) with `unittest.mock`
+- Use `tmp_path` fixture for temporary files
+- Test edge cases: empty inputs, None values, boundary conditions
+
+## Test Execution Workflow
+
+1. **Before implementing**: Consider what tests are needed
+2. **During implementation**: Write tests alongside code (TDD if preferred)
+3. **After implementation**: 
+   - Run the test suite: `cd frontend && npm test` or `cd backend && pytest`
+   - Fix any failing tests
+   - Ensure all tests pass before marking task complete
+4. **Before committing**: Verify all tests pass
+
+## Test Coverage Goals
+
+- **Aim for high coverage** of critical paths
+- **Focus on user-facing behavior** and business logic
+- **Don't test implementation details** unnecessarily
+- **Test error handling** and edge cases
+
+## Common Patterns
+
+### Frontend: Mocking API calls
+```typescript
+vi.mock('../lib/api', () => ({
+  streamChat: vi.fn(),
+}));
+
+// In test
+vi.mocked(api.streamChat).mockReturnValue(mockStream());
+```
+
+### Backend: Mocking file operations
+```python
+with patch("module._file_path", return_value=tmp_path / "file.json"):
+    # Test code that uses file
+    pass
+```
+
+### Backend: Testing FastAPI endpoints
+```python
+def test_endpoint_success(client):
+    response = client.post("/api/endpoint", json={"key": "value"})
+    assert response.status_code == 200
+    assert response.json()["result"] == "expected"
+```
+
+## Troubleshooting
+
+- **Tests not found**: Check file naming (`*.test.tsx`, `test_*.py`)
+- **Import errors**: Ensure test files are in correct directories
+- **Mock not working**: Verify `vi.mock()` is called before imports
+- **Async issues**: Use `waitFor` in frontend, `await` in backend async tests
